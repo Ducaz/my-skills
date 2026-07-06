@@ -1,0 +1,4 @@
+interface:
+  display_name: "Jellyfin Media Organizer"
+  short_description: "Plan and verify Jellyfin media folder layouts."
+  default_prompt: "Use $jellyfin-media-organizer to organize this media folder for Jellyfin."

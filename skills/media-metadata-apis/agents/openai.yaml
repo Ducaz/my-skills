@@ -1,0 +1,4 @@
+interface:
+  display_name: "Media Metadata APIs"
+  short_description: "Query TMDB, AniDB, and TVDB metadata"
+  default_prompt: "Use $media-metadata-apis to look up and cross-check metadata for this movie, series, or anime."
