@@ -1,0 +1,104 @@
+---
+name: image-prompt-helper
+description: Optimize text-to-image and image-editing prompts. Use when the user wants to improve, rewrite, repair, expand, translate, or create an image generation prompt from rough text, keywords, tags, a topic/theme, style notes, examples, reference images, or an existing prompt; use for photorealistic, product, logo, UI, infographic, poster, anime, manga, character sheet, multi-panel, reference-guided, and image-editing prompts, including cases where the user supplies only a reference image and needs a prompt to closely recreate it.
+---
+
+# Image Prompt Helper
+
+## Core Behavior
+
+Turn the user's input into a complete optimized image-generation prompt. Preserve the user's intent, strengthen visual specificity, remove contradictions, and add only details that materially improve composition, usability, or coherence.
+
+Default to the user's input language. If the language is unclear, use English. Default to natural-language prompt structure unless the task is precision-heavy; use structured or hybrid format for diagrams, UI, ads, posters with exact copy, multi-panel images, reference-guided work, or controlled edits.
+
+Do not generate the image unless the user explicitly asks for image generation. This skill's default output is the optimized prompt.
+
+## Workflow
+
+1. Classify the input:
+   - Creation: new image from a theme, idea, tags, or references.
+   - Editing: controlled change to an existing image.
+   - Reference-only recreation: no text request beyond one or more images.
+   - Repair: user provides a prompt and wants optimization.
+2. Identify the required visual brief:
+   - Asset type, canvas/aspect ratio, intended use.
+   - Subject, action, environment, composition, style/medium.
+   - Materials, lighting, palette, mood.
+   - Exact text/data and constraints.
+   - Avoid list for likely failure modes.
+3. Resolve gaps conservatively:
+   - Keep precise user details unchanged.
+   - Replace vague praise with visible evidence.
+   - Remove invisible details and conflicting instructions.
+   - Add plausible defaults only when the input is underspecified.
+4. Produce a final prompt:
+   - Natural language by default, usually 2-4 compact paragraphs.
+   - Hybrid or structured format when precision matters.
+   - Include exact text verbatim when supplied.
+   - Keep model/API parameters separate unless the user asks for them.
+5. Optionally include a short note only when useful:
+   - "Assumptions" for important inferred details.
+   - "Need from user" only if a missing fact blocks correctness.
+   - Avoid long explanations unless the user requests reasoning.
+
+## Creation Prompt Rules
+
+Use this order for natural-language prompts:
+
+```text
+Deliverable and scene -> subject and action -> composition -> art direction ->
+lighting and mood -> exact text -> constraints
+```
+
+For reference-guided creation, label each reference by role and state what to borrow: character design, product form, palette, texture, composition, lighting, or mood. Say what not to copy when needed.
+
+When the user provides only a reference image, create a prompt that closely recreates the visible image. Describe observable subject, environment, composition, camera/framing, style, lighting, palette, materials, and constraints. Do not invent hidden backstory. If exact identity, brand, or protected character imitation would be risky for a public/reusable output, describe transferable visual traits instead.
+
+## Editing Prompt Rules
+
+For image edits, write a controlled-difference prompt using:
+
+```text
+Change + Preserve + Integrate + Avoid
+```
+
+Preserve instructions are often more important than the change. Name invariants such as identity, pose, camera angle, crop, geometry, object placement, lighting direction, readable text, brand marks, and background.
+
+For multi-image edits, label inputs by role:
+
+```text
+Image 1: Base image and edit target
+Image 2: Style/material/object reference
+```
+
+Then describe how the references interact.
+
+## Output Shape
+
+Default response:
+
+```text
+优化后的提示词：
+
+[final prompt]
+```
+
+For English output:
+
+```text
+Optimized prompt:
+
+[final prompt]
+```
+
+If the user asks for multiple variants, provide distinct prompt variants with a short label for each. If they ask for analysis, put the final prompt first, then concise reasoning.
+
+## Reference Files
+
+Load only the references needed for the request:
+
+- `references/prompt-quality.md`: Use for general optimization, repair, judging prompt quality, exact text, constraints, and common failure modes.
+- `references/prompt-patterns.md`: Use for selecting natural, structured, hybrid, creation, editing, and reference-only prompt templates.
+- `references/use-cases.md`: Use for product, ad, logo, UI, infographic, diagram, comic, photorealistic, historical, and catalog prompts.
+- `references/anime-manga.md`: Use for anime, manga, character grids, expression sheets, key visuals, manga pages, and tasteful anime fashion prompts.
+- `references/openai-guidance.md`: Use when the user asks about OpenAI-specific image model prompting, quality/size/model parameter notes, or when official guidance affects the prompt strategy.

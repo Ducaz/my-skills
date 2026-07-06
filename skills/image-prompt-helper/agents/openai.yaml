@@ -1,0 +1,4 @@
+interface:
+  display_name: "Image Prompt Helper"
+  short_description: "Optimize prompts for image generation"
+  default_prompt: "Use $image-prompt-helper to turn my rough image idea into a polished generation prompt."
