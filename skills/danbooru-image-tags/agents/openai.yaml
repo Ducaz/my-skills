@@ -1,0 +1,4 @@
+interface:
+  display_name: "Danbooru Image Tags"
+  short_description: "分析图片并生成经 API 验证的 Exact 或 Common 标签"
+  default_prompt: "Use $danbooru-image-tags to analyze this image and return validated Danbooru tags in Exact and Common modes."
