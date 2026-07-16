@@ -32,9 +32,11 @@ Accept a tag only when:
 
 Do not count an HTTP success alone as validation. Missing records, empty tags, and deprecated tags are rejected. This skill deliberately does not auto-resolve aliases: an alias or typo must be reconsidered by the image-analysis step and its canonical replacement must be validated in a new pass.
 
-## Frequency policy
+## Frequency and booster policy
 
-Exact mode has no minimum count beyond `post_count > 0`. Common mode defaults to `post_count >= 1000`. The threshold is a reproducibility heuristic, not a Danbooru validity rule and not a guarantee that a particular checkpoint learned the tag.
+Exact mode has no minimum count beyond `post_count > 0`. Common mode uses the user-facing `min-post-count` parameter and defaults to `1000`. The threshold is a reproducibility heuristic, not a Danbooru validity rule and not a guarantee that a particular checkpoint learned the tag.
+
+When `quality-boosters=true`, validate booster candidates exactly like visual tags. A recognizable Stable Diffusion token is not valid for this skill unless Danbooru returns an active, nonempty tag. Require accepted Common boosters to meet `min-post-count`.
 
 ## Failure policy
 

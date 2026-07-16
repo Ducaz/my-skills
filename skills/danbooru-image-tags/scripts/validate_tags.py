@@ -28,7 +28,7 @@ def chunks(values: list[str], size: int):
 
 
 def fetch_json(url: str, retries: int, timeout: float) -> Any:
-    request = Request(url, headers={"Accept": "application/json", "User-Agent": "Codex-Danbooru-Image-Tags/1.0"})
+    request = Request(url, headers={"Accept": "application/json", "User-Agent": "Codex-Danbooru-Image-Tags/1.1"})
     for attempt in range(retries + 1):
         try:
             with urlopen(request, timeout=timeout) as response:
@@ -102,12 +102,12 @@ def validate(args: argparse.Namespace) -> dict[str, Any]:
     return {
         "endpoint": endpoint,
         "validated_at": datetime.now(timezone.utc).isoformat(),
-        "common_min_count": args.common_min_count,
+        "min_post_count": args.min_post_count,
         "input_count": len(candidates),
         "valid_count": len(valid),
         "rejected_count": len(rejected),
         "exact": valid,
-        "common": [item for item in valid if item["post_count"] >= args.common_min_count],
+        "common": [item for item in valid if item["post_count"] >= args.min_post_count],
         "rejected": rejected,
     }
 
@@ -117,15 +117,22 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--input", required=True, help="UTF-8 text file with one candidate tag per line")
     parser.add_argument("--output", help="write the JSON report to this path; stdout if omitted")
     parser.add_argument("--endpoint", default="https://danbooru.donmai.us", help="Danbooru base URL")
-    parser.add_argument("--common-min-count", type=int, default=1000)
+    parser.add_argument(
+        "--min-post-count",
+        "--common-min-count",
+        dest="min_post_count",
+        type=int,
+        default=1000,
+        help="minimum post_count for Common tags (default: 1000)",
+    )
     parser.add_argument("--batch-size", type=int, default=50)
     parser.add_argument("--login")
     parser.add_argument("--api-key")
     parser.add_argument("--timeout", type=float, default=20.0)
     parser.add_argument("--retries", type=int, default=3)
     args = parser.parse_args()
-    if args.common_min_count < 1:
-        parser.error("--common-min-count must be at least 1")
+    if args.min_post_count < 1:
+        parser.error("--min-post-count must be at least 1")
     if not 1 <= args.batch_size <= 100:
         parser.error("--batch-size must be between 1 and 100")
     if bool(args.login) != bool(args.api_key):
