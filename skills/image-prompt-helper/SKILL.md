@@ -1,6 +1,6 @@
 ---
 name: image-prompt-helper
-description: Optimize text-to-image and image-editing prompts. Use when the user wants to improve, rewrite, repair, expand, translate, or create an image generation prompt from rough text, keywords, tags, a topic/theme, style notes, examples, reference images, or an existing prompt; use for photorealistic, product, logo, UI, infographic, poster, anime, manga, character sheet, multi-panel, reference-guided, and image-editing prompts, including cases where the user supplies only a reference image and needs a prompt to closely recreate it.
+description: Optimize text-to-image and image-editing prompts. Use when the user wants to improve, rewrite, repair, expand, translate, or create an image generation prompt from rough text, keywords, tags, a topic/theme, style notes, examples, reference images, or an existing prompt; use for photorealistic, product, logo, UI, infographic, poster, anime, manga, character sheet, multi-panel, reference-guided, and image-editing prompts, including cases where the user supplies only an image and needs a standalone text-only prompt to closely recreate it.
 ---
 
 # Image Prompt Helper
@@ -13,12 +13,14 @@ Default to the user's input language. If the language is unclear, use English. D
 
 Do not generate the image unless the user explicitly asks for image generation. This skill's default output is the optimized prompt.
 
+For reference-only recreation, the uploaded image is analysis input, not a required generation input. The final prompt must be fully self-contained and recreate the image from text alone. Translate every relevant visible feature into words; never rely on phrases such as "the reference image," "the original image," "the uploaded image," "as shown," "same as the source," or "preserve the existing composition." A reader and image model that cannot see the upload must still understand the intended result.
+
 ## Workflow
 
 1. Classify the input:
    - Creation: new image from a theme, idea, tags, or references.
    - Editing: controlled change to an existing image.
-   - Reference-only recreation: no text request beyond one or more images.
+   - Reference-only recreation: one or more images are supplied so the assistant can extract a standalone text prompt that recreates their visible result.
    - Repair: user provides a prompt and wants optimization.
 2. Identify the required visual brief:
    - Asset type, canvas/aspect ratio, intended use.
@@ -36,6 +38,7 @@ Do not generate the image unless the user explicitly asks for image generation. 
    - Hybrid or structured format when precision matters.
    - Include exact text verbatim when supplied.
    - Keep model/API parameters separate unless the user asks for them.
+   - For reference-only recreation, remove all references to the input image and express the result entirely as observable visual instructions.
 5. Optionally include a short note only when useful:
    - "Assumptions" for important inferred details.
    - "Need from user" only if a missing fact blocks correctness.
@@ -52,7 +55,9 @@ lighting and mood -> exact text -> constraints
 
 For reference-guided creation, label each reference by role and state what to borrow: character design, product form, palette, texture, composition, lighting, or mood. Say what not to copy when needed.
 
-When the user provides only a reference image, create a prompt that closely recreates the visible image. Describe observable subject, environment, composition, camera/framing, style, lighting, palette, materials, and constraints. Do not invent hidden backstory. If exact identity, brand, or protected character imitation would be risky for a public/reusable output, describe transferable visual traits instead.
+When the user provides only an image, inspect it and create a standalone text-to-image prompt that closely recreates the visible result without requiring the image at generation time. Explicitly describe the asset type, subject appearance, pose/action, environment, object placement and spatial relationships, composition, camera/viewpoint, framing/crop, style/medium, lighting and shadows, palette, materials, textures, mood, readable text, and relevant exclusions. Convert visual relationships into concrete language instead of saying to match, copy, preserve, or refer to the input. Do not invent hidden backstory. If exact identity, brand, or protected character imitation would be risky for a public/reusable output, describe transferable visual traits instead.
+
+Before returning a reference-only recreation prompt, apply this deletion test: if the uploaded image and all surrounding conversation were removed, the prompt alone must still specify what to generate. If not, add the missing visual description.
 
 ## Editing Prompt Rules
 

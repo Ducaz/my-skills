@@ -14,6 +14,8 @@ A strong prompt is a visual brief, not a bag of keywords. It should answer:
 
 Prefer clear visual specifications over long decorative prose. A prompt is ready when another person could sketch the intended image, identify the focal subject, understand the visual hierarchy, quote required text exactly, and see what must remain unchanged in an edit.
 
+For prompts extracted from an uploaded image, also require text-only portability: the prompt must remain complete after the upload and conversation context are removed. The image may inform the analysis, but it must not remain a dependency of the generated prompt.
+
 ## Anatomy Checklist
 
 Use only sections that materially affect the image:
@@ -37,6 +39,7 @@ Use only sections that materially affect the image:
 - Separate content from presentation: content says what exists; presentation says how it is shown.
 - Remove invisible details unless they affect visible pose, silhouette, fold, shadow, reflection, occlusion, or interaction.
 - Resolve contradictions such as "minimalist" plus many props, "flat vector" plus photorealistic skin, or "no text" plus a required slogan.
+- In recreation prompts extracted from images, replace references such as "the original," "the source," "as shown," "same composition," or "match the reference" with explicit descriptions of the visible feature, position, scale, viewpoint, lighting, color, or relationship.
 - Avoid long negative lists. Name only likely failure modes.
 - Do not ask the image model to invent important copy, labels, prices, dates, axes, or scientific data.
 - For public/reusable work, prefer original subjects and transferable visual traits over exact copying of protected characters, logos, or living creators' recognizable styles.

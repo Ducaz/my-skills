@@ -93,14 +93,21 @@ Create a new scene using [specific attributes] from Image 1 and [specific attrib
 
 ## Reference-Only Recreation
 
-When the user only supplies an image, write a prompt that recreates visible features:
+When the user supplies an image to obtain a recreation prompt, use the image only to observe the result. Write a self-contained text-to-image prompt that does not require the image as an input:
 
 ```text
-Create an image closely matching the reference: [asset type and main subject].
+Create [asset type and main subject, stated directly].
 
-Describe the visible subject, pose/action, environment, composition, viewpoint, crop, depth, lighting, color palette, materials, textures, style, and mood.
-
-Constraints: preserve the visible composition and key design relationships; avoid adding extra objects, text, logos, or changing the visual genre unless present in the reference.
+Subject: [appearance, count, pose/action, expression, clothing, and distinctive visible features].
+Scene: [environment, background, props, object placement, and spatial relationships].
+Composition: [viewpoint, camera angle, framing, crop, focal hierarchy, depth, and negative space].
+Rendering: [medium/style, lighting direction and quality, shadows, palette, materials, textures, and mood].
+Text: [all readable text quoted exactly, with placement and typography; otherwise say no text].
+Constraints: [concrete elements to include or exclude].
 ```
 
+Do not use deictic or dependency language such as "the reference," "the original," "the uploaded image," "the source," "as shown," "same as," "match," "copy," or "preserve the existing composition." Replace each such instruction with the actual visual property or relationship. For example, replace "keep the same camera angle" with "three-quarter view from slightly below eye level," and replace "preserve the layout" with explicit positions, scale, spacing, and hierarchy.
+
 If the image includes identifiable people, brands, copyrighted characters, or living-artist style, avoid instructing exact public imitation. Describe observable, transferable visual traits.
+
+Deletion test: hide the supplied image and read only the final prompt. If any subject, layout, style, color, lighting, text, or constraint remains unknowable, the prompt is incomplete.
