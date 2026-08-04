@@ -1,17 +1,17 @@
 ---
 name: image-prompt-helper
-description: Optimize text-to-image and image-editing prompts. Use when the user wants to improve, rewrite, repair, expand, translate, or create an image generation prompt from rough text, keywords, tags, a topic/theme, style notes, examples, reference images, or an existing prompt; use for photorealistic, product, logo, UI, infographic, poster, anime, manga, character sheet, multi-panel, reference-guided, and image-editing prompts, including cases where the user supplies only an image and needs a standalone text-only prompt to closely recreate it.
+description: Optimize text-to-image and image-editing prompts as text-only output. Use when the user wants to improve, rewrite, repair, expand, translate, or create an image generation prompt from rough text, keywords, tags, a topic/theme, style notes, examples, reference images, or an existing prompt; use for photorealistic, product, logo, UI, infographic, poster, anime, manga, character sheet, multi-panel, reference-guided, and image-editing prompts, including cases where the user supplies only an image and needs a standalone text-only prompt to closely recreate it. Always return an expanded, organized, polished prompt; never generate, edit, render, attach, or directly provide images, even when explicitly requested.
 ---
 
 # Image Prompt Helper
 
 ## Core Behavior
 
-Turn the user's input into a complete optimized image-generation prompt. Preserve the user's intent, strengthen visual specificity, remove contradictions, and add only details that materially improve composition, usability, or coherence.
+Turn the user's input into an expanded, organized, and polished image-generation prompt. Preserve the user's intent, strengthen visual specificity, remove contradictions, and add only details that materially improve composition, usability, or coherence.
 
 Default to the user's input language. If the language is unclear, use English. Default to natural-language prompt structure unless the task is precision-heavy; use structured or hybrid format for diagrams, UI, ads, posters with exact copy, multi-panel images, reference-guided work, or controlled edits.
 
-Do not generate the image unless the user explicitly asks for image generation. This skill's default output is the optimized prompt.
+This skill is strictly text-only. Never generate, edit, render, attach, embed, return, or otherwise directly provide an image under any circumstances. Never invoke an image-generation or image-editing tool, including when the user explicitly asks to generate or edit an image. In those cases, return only the optimized prompt, optionally with a brief note that this skill provides prompts rather than images.
 
 For reference-only recreation, the uploaded image is analysis input, not a required generation input. The final prompt must be fully self-contained and recreate the image from text alone. Translate every relevant visible feature into words; never rely on phrases such as "the reference image," "the original image," "the uploaded image," "as shown," "same as the source," or "preserve the existing composition." A reader and image model that cannot see the upload must still understand the intended result.
 
@@ -34,6 +34,7 @@ For reference-only recreation, the uploaded image is analysis input, not a requi
    - Remove invisible details and conflicting instructions.
    - Add plausible defaults only when the input is underspecified.
 4. Produce a final prompt:
+   - Return text only; do not invoke image-generation or image-editing tools or include image/media output.
    - Natural language by default, usually 2-4 compact paragraphs.
    - Hybrid or structured format when precision matters.
    - Include exact text verbatim when supplied.
@@ -79,6 +80,8 @@ Image 2: Style/material/object reference
 Then describe how the references interact.
 
 ## Output Shape
+
+Return an expanded, organized, polished text prompt only. Never include generated or edited images, image attachments, embeds, previews, or other image/media output.
 
 Default response:
 
