@@ -86,14 +86,6 @@ Return an expanded, organized, polished text prompt only. Never include generate
 Default response:
 
 ```text
-优化后的提示词：
-
-[final prompt]
-```
-
-For English output:
-
-```text
 Optimized prompt:
 
 [final prompt]
