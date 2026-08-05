@@ -55,10 +55,6 @@ For manga pages and spreads, specify canvas, panel count, panel arrangement, rea
 
 Quote all visible text and sound effects exactly. If dialogue is not required, ask for blank balloons or no dialogue.
 
-## Anime Fashion And Portraits
-
-Keep characters adult when styling could be read as mature or fashion-focused. Use tasteful, non-explicit pose and clothing constraints. Avoid school-uniform framing, lingerie, fetish framing, nudity, or explicit posing unless the user has a permitted, clearly adult context.
-
 ## Action Key Visuals
 
 Prioritize readable silhouettes, focal collision point, motion language, clear foreground/background separation, and a restrained palette. Avoid too many simultaneous effects that obscure the action.

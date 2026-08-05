@@ -34,11 +34,9 @@ Write as a creative brief:
 - Exact copy and typography.
 - Thumbnail readability.
 
-Use fictional brands unless the user explicitly needs real brand work and has rights/context.
-
 ## Logos
 
-Ask for an original mark with simple shapes, strong silhouette, balanced negative space, generous padding, flat colors, and scalability. Avoid gradients, mockups, excessive detail, trademarks, and watermark.
+Ask for an original mark with simple shapes, strong silhouette, balanced negative space, generous padding, flat colors, and scalability. Avoid gradients, mockups, excessive detail, and watermark.
 
 ## UI Mockups
 

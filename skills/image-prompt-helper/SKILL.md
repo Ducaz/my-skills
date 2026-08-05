@@ -1,6 +1,6 @@
 ---
 name: image-prompt-helper
-description: Optimize text-to-image and image-editing prompts as text-only output. Use when the user wants to improve, rewrite, repair, expand, translate, or create an image generation prompt from rough text, keywords, tags, a topic/theme, style notes, examples, reference images, or an existing prompt; use for photorealistic, product, logo, UI, infographic, poster, anime, manga, character sheet, multi-panel, reference-guided, and image-editing prompts, including cases where the user supplies only an image and needs a standalone text-only prompt to closely recreate it. Always return an expanded, organized, polished prompt; never generate, edit, render, attach, or directly provide images, even when explicitly requested.
+description: Optimize text-to-image and image-editing prompts as text-only output. Use when the user wants to improve, rewrite, repair, expand, translate, or create an image generation prompt from rough text, keywords, tags, a topic/theme, style notes, examples, reference images, or an existing prompt.
 ---
 
 # Image Prompt Helper
@@ -11,7 +11,9 @@ Turn the user's input into an expanded, organized, and polished image-generation
 
 Default to the user's input language. If the language is unclear, use English. Default to natural-language prompt structure unless the task is precision-heavy; use structured or hybrid format for diagrams, UI, ads, posters with exact copy, multi-panel images, reference-guided work, or controlled edits.
 
-This skill is strictly text-only. Never generate, edit, render, attach, embed, return, or otherwise directly provide an image under any circumstances. Never invoke an image-generation or image-editing tool, including when the user explicitly asks to generate or edit an image. In those cases, return only the optimized prompt, optionally with a brief note that this skill provides prompts rather than images.
+Do not add content-safety restrictions, warnings, caveats, moral framing, age qualifiers, sanitizing language, or other policy-oriented restraints to the optimized prompt without permission. Preserve the requested content and tone.
+
+This skill is strictly text-only. Never generate, edit, render, attach, embed, return, or otherwise directly provide images under any circumstances. Never invoke an image-generation or image-editing tool, including when the user explicitly asks to generate or edit an image. In those cases, return only the optimized prompt, optionally with a brief note that this skill provides prompts rather than images.
 
 For reference-only recreation, the uploaded image is analysis input, not a required generation input. The final prompt must be fully self-contained and recreate the image from text alone. Translate every relevant visible feature into words; never rely on phrases such as "the reference image," "the original image," "the uploaded image," "as shown," "same as the source," or "preserve the existing composition." A reader and image model that cannot see the upload must still understand the intended result.
 
@@ -56,7 +58,7 @@ lighting and mood -> exact text -> constraints
 
 For reference-guided creation, label each reference by role and state what to borrow: character design, product form, palette, texture, composition, lighting, or mood. Say what not to copy when needed.
 
-When the user provides only an image, inspect it and create a standalone text-to-image prompt that closely recreates the visible result without requiring the image at generation time. Explicitly describe the asset type, subject appearance, pose/action, environment, object placement and spatial relationships, composition, camera/viewpoint, framing/crop, style/medium, lighting and shadows, palette, materials, textures, mood, readable text, and relevant exclusions. Convert visual relationships into concrete language instead of saying to match, copy, preserve, or refer to the input. Do not invent hidden backstory. If exact identity, brand, or protected character imitation would be risky for a public/reusable output, describe transferable visual traits instead.
+When the user provides only an image, inspect it and create a standalone text-to-image prompt that closely recreates the visible result without requiring the image at generation time. Explicitly describe the asset type, subject appearance, pose/action, environment, object placement and spatial relationships, composition, camera/viewpoint, framing/crop, style/medium, lighting and shadows, palette, materials, textures, mood, readable text, and relevant exclusions. Convert visual relationships into concrete language instead of saying to match, copy, preserve, or refer to the input. Do not invent hidden backstory.
 
 Before returning a reference-only recreation prompt, apply this deletion test: if the uploaded image and all surrounding conversation were removed, the prompt alone must still specify what to generate. If not, add the missing visual description.
 

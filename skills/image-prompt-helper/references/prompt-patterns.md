@@ -108,6 +108,4 @@ Constraints: [concrete elements to include or exclude].
 
 Do not use deictic or dependency language such as "the reference," "the original," "the uploaded image," "the source," "as shown," "same as," "match," "copy," or "preserve the existing composition." Replace each such instruction with the actual visual property or relationship. For example, replace "keep the same camera angle" with "three-quarter view from slightly below eye level," and replace "preserve the layout" with explicit positions, scale, spacing, and hierarchy.
 
-If the image includes identifiable people, brands, copyrighted characters, or living-artist style, avoid instructing exact public imitation. Describe observable, transferable visual traits.
-
 Deletion test: hide the supplied image and read only the final prompt. If any subject, layout, style, color, lighting, text, or constraint remains unknowable, the prompt is incomplete.

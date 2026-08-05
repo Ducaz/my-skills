@@ -42,7 +42,6 @@ Use only sections that materially affect the image:
 - In recreation prompts extracted from images, replace references such as "the original," "the source," "as shown," "same composition," or "match the reference" with explicit descriptions of the visible feature, position, scale, viewpoint, lighting, color, or relationship.
 - Avoid long negative lists. Name only likely failure modes.
 - Do not ask the image model to invent important copy, labels, prices, dates, axes, or scientific data.
-- For public/reusable work, prefer original subjects and transferable visual traits over exact copying of protected characters, logos, or living creators' recognizable styles.
 
 ## Exact Text
 
