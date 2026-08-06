@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate candidate tags against Danbooru and classify Exact/Common sets."""
+"""Bulk-validate candidate tags against Danbooru and a post-count floor."""
 
 from __future__ import annotations
 
@@ -74,7 +74,7 @@ def validate(args: argparse.Namespace) -> dict[str, Any]:
             if name in batch:
                 found[name] = item
 
-    valid = []
+    accepted = []
     rejected = []
     for name in candidates:
         item = found.get(name)
@@ -90,24 +90,25 @@ def validate(args: argparse.Namespace) -> dict[str, Any]:
             rejected.append({"name": name, "reason": "empty", "post_count": count})
             continue
         category = int(item.get("category", 0))
-        valid.append(
-            {
-                "name": name,
-                "category": category,
-                "category_name": CATEGORY_NAMES.get(category, "unknown"),
-                "post_count": count,
-            }
-        )
+        record = {
+            "name": name,
+            "category": category,
+            "category_name": CATEGORY_NAMES.get(category, "unknown"),
+            "post_count": count,
+        }
+        if count < args.min_post_count:
+            rejected.append({**record, "reason": "below_min_post_count"})
+            continue
+        accepted.append(record)
 
     return {
         "endpoint": endpoint,
         "validated_at": datetime.now(timezone.utc).isoformat(),
         "min_post_count": args.min_post_count,
         "input_count": len(candidates),
-        "valid_count": len(valid),
+        "accepted_count": len(accepted),
         "rejected_count": len(rejected),
-        "exact": valid,
-        "common": [item for item in valid if item["post_count"] >= args.min_post_count],
+        "accepted": accepted,
         "rejected": rejected,
     }
 
@@ -123,7 +124,7 @@ def parse_args() -> argparse.Namespace:
         dest="min_post_count",
         type=int,
         default=1000,
-        help="minimum post_count for Common tags (default: 1000)",
+        help="minimum post_count for every accepted tag (default: 1000)",
     )
     parser.add_argument("--batch-size", type=int, default=50)
     parser.add_argument("--login")

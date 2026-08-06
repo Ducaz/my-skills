@@ -1,92 +1,179 @@
 ---
 name: danbooru-image-tags
-description: Analyze user-provided images and produce Danbooru tags for Stable Diffusion-style text-to-image reproduction, with Exact and Common modes and mandatory validation against the Danbooru Tags API. Supports the integer prompt parameter min-post-count and the boolean prompt parameter quality-boosters. Use when a user uploads or references an image and asks for Danbooru tags, booru prompts, SD/SDXL prompt tags, image-to-prompt analysis, tag verification, or a detailed versus broadly learned tag set.
+description: Convert reference images, text-only image-generation instructions, mixed image-and-text requests, and direct tag lookup queries into canonical Danbooru tags with bulk verification against the Danbooru Tags API. Use for image-to-tags, natural-language or irregular-tag prompt conversion, reference-guided prompt edits, tag discovery, negative prompts, booru prompts, and SD/SDXL tag requests. Return Markdown with positive tags in a fenced code block and an optional negative-tag block when useful. Prefer tags meeting the user-selected min-post-count, which defaults to 1000; if operational validation fails, return the candidate tags with a prominent unverified warning. Never generate or edit images.
 ---
 
-# Danbooru Image Tags
+# Danbooru Tags
 
-Analyze the visible image, translate observations into canonical Danbooru vocabulary, and return only API-validated tags. Support both detail-preserving Exact output and frequency-oriented Common output.
+Convert the user's intended subject, scene, or tag query into a concise set of canonical Danbooru tags.
 
-## User parameters
+## Non-negotiable contract
 
-Accept parameters directly after the skill invocation:
+- Never generate, edit, or transform an image. Never call an image-generation tool.
+- Format every successful result as Markdown. Put each tag list in its own fenced `text` code block so it remains copy-ready.
+- Provide a positive `Tags` block for scene-generation results and ordinary tag queries. Add a separate `Negative tags` block only when it is necessary or materially helpful. If the user explicitly requests only negative tags, return only the negative block.
+- Add brief explanatory prose only when it helps clarify ambiguity, interpretation, substitutions, omissions, parameter handling, negative-tag choices, or validation issues. Keep prose outside the code blocks so it cannot be mistaken for prompt tokens.
+- Attempt to validate every emitted tag during the current request. Do not rely on memory, apparent familiarity, user spelling, or a prior request's results when current validation is available.
+- After successful validation, emit a tag only when the Danbooru Tags API confirms that its canonical name exists, has `is_deprecated=false`, and has `post_count >= min-post-count`.
+- After successful validation, omit rejected candidates. Never present a rejected or unverified token as validated.
+- If operational validation fails, return the candidate tags under the explicit unverified fallback format below.
+
+## Parameters
+
+Accept parameters anywhere in the request:
 
 ```text
 $danbooru-image-tags min-post-count=1000 quality-boosters=false
 ```
 
-- `min-post-count=<int>`: Set the minimum `post_count` for Common tags. Default to `1000`. Require an integer of at least `1`. Exact remains valid with any `post_count > 0` so it can preserve rare details.
-- `quality-boosters=<boolean>`: Add quality-oriented prompt tags when `true`; omit them when `false`. Default to `false`. Accept only `true` or `false`, case-insensitively.
+- `min-post-count=<int>`: Apply this minimum to every emitted tag. Default to `1000`. Require an integer of at least `1`.
+- `quality-boosters=<boolean>`: When `true`, consider relevant quality-oriented Danbooru tags; default to `false`. Accept only `true` or `false`, case-insensitively. Boosters must pass the same minimum count and validation rules.
 
-Reject an invalid value explicitly and ask the user to correct it. Do not silently clamp, coerce, or reinterpret it. State the resolved parameter values in the result so the user can see what was applied.
+Do not silently clamp or reinterpret an invalid parameter. Ask for a corrected value without attempting a tag result.
 
-When `quality-boosters=true`, keep boosters separate from observed image facts while building candidates. Add only boosters that independently exist as active Danbooru tags and meet `min-post-count`. Do not bypass API validation for familiar model-specific tokens. Append accepted boosters at the end of each prompt and identify them in the validation summary.
+## Classify the input
 
-## Workflow
+Handle all four modes:
 
-1. Inspect every supplied image at sufficient detail. Use the local image viewer for filesystem images. If the image is missing or inaccessible, request it instead of guessing.
-2. Parse and validate the user parameters. Apply the defaults when they are omitted.
-3. Describe the image internally in layers: subject count, identity, appearance, clothing, pose/action, expression/gaze, composition/camera, environment, objects, lighting/color, and medium/style.
-4. Convert only visible or confidently identifiable facts into plausible Danbooru snake_case tags. Do not tag hidden details, speculate about identity, or infer an artist from visual style alone.
-5. Create a broad candidate union for both modes. If quality boosters are enabled, include those candidates with a separate internal marker. Put all canonical-looking tags in a temporary UTF-8 text file, one tag per line.
-6. Run `scripts/validate_tags.py` against that file using the resolved `min-post-count`. The script queries Danbooru in batches, rejects nonexistent, empty, and deprecated tags, and records category and post count.
-7. Reconsider rejected candidates. Replace them only when a valid canonical alternative is justified by the image, then validate again. Never silently present an unverified replacement.
-8. Build Exact and Common outputs from the final validated records according to the rules below.
-9. Return the image summary, applied parameters, both prompt lines, and a concise validation report. Delete temporary files unless the user asks to retain them.
+1. **Reference images only**: Describe the visible target internally and select tags that reproduce it as closely as the frequency threshold permits.
+2. **Text only**: Accept natural language, irregular or noncanonical tags, or a mixture. Infer the coherent image the user intends; treat supplied tokens as semantic hints, not verified tags.
+3. **Images plus text**: Use the images as the visual base and the text as requirements for the desired output. Explicit additions, removals, substitutions, emphasis, and style requests in the text override conflicting reference-image details. Preserve unrelated visible details.
+4. **Direct tag query**: Return only the valid tags requested or the closest valid tags that directly satisfy the query. Do not invent a full scene or pad the answer with generic prompt tags.
 
-## Exact mode
+When a request could be either text-to-scene or a direct tag query, treat it as a direct query if the user asks to find, list, identify, verify, translate, or suggest tags. Otherwise treat it as text-to-scene.
 
-- Preserve distinctive visual details with the narrowest justified valid tags.
-- Include useful low-frequency tags when the API confirms they are active and the detail is clearly visible.
-- Prefer specific tags over redundant parent concepts when the specific tag already communicates the detail well; keep both only when image-generation models commonly benefit from both.
-- Include character and copyright tags only when identity is confident. Format character tags exactly as Danbooru returns them.
-- Do not invent combinations merely because individual words are valid.
+## Build candidates
 
-## Common mode
+1. Parse parameters before selecting tags.
+2. Inspect every supplied image at sufficient detail. Use the local image viewer for filesystem images. If a required image is missing or inaccessible, request it rather than guessing.
+3. Build an internal representation appropriate to the mode:
+   - Scene modes: subject count/type, identity, appearance, clothing, pose/action, expression/gaze, framing/viewpoint, environment, objects, lighting/color, and medium/style.
+   - Direct query: requested concept, requested breadth, and any exclusions or category constraints.
+4. Resolve contradictions before tagging. Prefer explicit text requirements, then central visible evidence, then conservative inference.
+5. Convert concepts to plausible Danbooru snake_case candidates. Search the Danbooru tag-search or autocomplete APIs when spelling, canonical form, category, or terminology is uncertain.
+6. Do not infer an artist from visual style. Include artist tags only when explicitly requested or reliably identified from supplied metadata. Include character and copyright tags only when explicitly requested or confidently identifiable.
+7. Prefer common, visually meaningful tags. Avoid redundant, weakly implied, contradictory, model-specific, or decorative tags. Do not invent compound tags from individually valid words.
+8. Maintain separate positive and negative candidate sets. Place a candidate in the negative set only when the user explicitly excludes a concept, a mixed-input edit removes a visible feature, or excluding a likely unwanted interpretation would materially improve generation. Do not add generic negative-prompt boilerplate.
+9. Use bare canonical names in the negative set. Do not prefix them with `-` unless the user explicitly requests Danbooru search syntax; when a prefix is requested, validate the unprefixed tag name.
 
-- Favor tags likely to be broadly represented in Danbooru-trained or booru-captioned models.
-- Include only active tags meeting `min-post-count`.
-- Prefer visually central general, composition, pose, expression, clothing, and environment tags.
-- Omit rare micro-details and low-count identity tags. A valid tag is not automatically a Common tag.
-- Keep the result compact and non-contradictory; target roughly 12–30 tags unless the image is unusually complex.
+## Validate in bulk
 
-## Validation command
-
-Run from the skill directory:
+Place the union of positive and negative candidates in a temporary UTF-8 text file, one tag per line, and run from this skill directory:
 
 ```powershell
 python scripts/validate_tags.py --input <candidate-tags.txt> --min-post-count 1000 --output <validated.json>
 ```
 
-For authenticated requests, optionally add `--login <name> --api-key <key>`. Never print or save the API key in output artifacts. Read [references/danbooru-api.md](references/danbooru-api.md) when changing endpoint behavior, interpreting categories, or diagnosing API failures.
+Substitute the resolved threshold. For authenticated requests, optionally add `--login <name> --api-key <key>`; never print, log, or save the API key in an output artifact.
 
-The command exits nonzero if the API cannot validate all requests. Treat network errors, rate limits, HTML challenge pages, and malformed responses as validation failure. Report that final verification could not be completed; do not label candidates as verified.
+The validator queries `/tags.json` in batches and places only current, nonempty tags meeting the threshold in `accepted`. When the validator succeeds, build both output blocks exclusively from those `accepted` records, then restore each accepted tag to its positive or negative set.
 
-## Ordering and output
+For `not_found`, `deprecated`, `empty`, or `below_min_post_count` candidates, use Danbooru tag search or autocomplete to find a semantically faithful common alternative, then bulk-validate the replacement. Do not replace a specific concept with a broader tag when doing so changes the user's meaning. If no faithful qualifying tag exists, omit it.
 
-Order prompt tags for practical generation:
+Read [references/danbooru-api.md](references/danbooru-api.md) when changing endpoint behavior, interpreting tag categories, or diagnosing API failures. Treat rate limits, network errors, HTML challenge pages, malformed JSON, partial batches, and nonzero validator exits as potential validation failures, then classify them under the fallback rules below.
+
+Delete temporary files after validation unless the user asks to retain them.
+
+## Validation-failure fallback
+
+Distinguish a tag rejection from an operational validation failure:
+
+- A functioning API that returns `not_found`, `deprecated`, `empty`, or `below_min_post_count` for a candidate is a successful validation result. Omit or replace that candidate normally; do not use the fallback.
+- A timeout, connection failure, rate limit, server error, HTML challenge page, malformed or incomplete response, or exhausted retry sequence is an operational validation failure. Use the fallback.
+- Fix a local invocation or temporary-file error and retry validation before using the fallback. Do not disguise a correctable local error as an API outage.
+
+On operational failure:
+
+1. Keep the intended positive and negative sets separate.
+2. Normalize candidates to the most plausible canonical snake_case form and remove duplicates, contradictions, speculative details, and weak alternatives.
+3. Return the remaining candidates even though their existence, canonical spelling, deprecation status, category, and post counts could not be confirmed.
+4. Place a prominent warning before the tag blocks and label every returned block `(unverified)`.
+5. Do not claim that `min-post-count` was enforced. State that the requested threshold could not be confirmed.
+6. Do not include raw exception traces, credentials, API keys, or verbose diagnostics.
+
+## Negative tags
+
+Use negative tags conservatively. Include them when at least one of these conditions applies:
+
+- The user says to exclude, avoid, remove, omit, or render without a concept.
+- Text instructions replace or remove a feature visible in a reference image.
+- The intended scene has a strong, predictable ambiguity that a small negative set can resolve.
+- The user explicitly requests a negative prompt.
+
+Omit the negative block for ordinary direct tag queries unless the user asks for exclusions or negative-prompt suggestions. Do not add routine quality negatives merely because they are popular. Never place the same tag in both positive and negative sets; resolve the contradiction from the user's explicit intent before output.
+
+When validation succeeds, every negative tag must independently pass the same existence, deprecation, and `min-post-count` checks as every positive tag. When validation fails operationally, apply the same unverified warning and labeling to the negative block.
+
+## Final selection and ordering
+
+Keep only tags relevant to the requested image or query. Prefer the smallest set that preserves the important information; do not force a fixed tag count.
+
+For scene outputs, order tags as follows:
 
 1. subject count and subject type
-2. character/copyright identity when justified
+2. character and copyright identity
 3. major appearance and clothing
 4. pose, action, expression, and gaze
 5. framing, viewpoint, and composition
 6. environment, objects, lighting, color, and medium
 7. enabled and validated quality boosters
 
-Use this compact structure:
+For direct queries, preserve the user's requested order when practical; otherwise order from the closest match to broader alternatives.
 
-```markdown
-Image: <one-sentence factual summary>
-Parameters: min-post-count=<value>, quality-boosters=<true|false>
+Default output:
 
-Exact (<N> validated tags):
-<comma-separated tags>
+````markdown
+## Tags
 
-Common (<N> validated tags, minimum count <threshold>):
-<comma-separated tags>
+```text
+tag_one, tag_two, tag_three
+```
+````
 
-Validation: <endpoint, validation time, accepted/rejected counts, accepted boosters; list rejected candidates when useful>
+When negative tags are useful:
+
+````markdown
+## Tags
+
+```text
+tag_one, tag_two, tag_three
 ```
 
-Keep underscores because Danbooru and most booru-captioned models use them. Do not add quality boosters unless `quality-boosters=true`, and never include a booster that failed Danbooru validation.
+## Negative tags
+
+```text
+negative_tag_one, negative_tag_two
+```
+````
+
+When an explanation is useful, append a short note after the tag blocks:
+
+````markdown
+## Tags
+
+```text
+tag_one, tag_two, tag_three
+```
+
+Note: <brief explanation that does not introduce unvalidated prompt tokens>
+````
+
+When validation fails operationally, use this fallback format:
+
+````markdown
+> **Warning:** Danbooru validation failed. The tags below are unverified; their existence, canonical spelling, deprecation status, and post counts could not be confirmed. The requested `min-post-count` threshold was not enforced.
+
+## Tags (unverified)
+
+```text
+candidate_tag_one, candidate_tag_two
+```
+
+## Negative tags (unverified)
+
+```text
+candidate_negative_tag
+```
+````
+
+Omit the unverified negative block when no negative tags are useful. If validation later becomes available, rerun the full candidate union rather than treating fallback tags as previously verified.

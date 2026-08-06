@@ -1,4 +1,4 @@
 interface:
-  display_name: "Danbooru Image Tags"
-  short_description: "Generate API-validated Danbooru tags with frequency and quality parameters."
-  default_prompt: "Use $danbooru-image-tags to analyze this image with min-post-count=1000 and quality-boosters=false, then return Exact and Common validated tags."
+  display_name: "Danbooru Tags"
+  short_description: "Create Danbooru tags with validation fallback."
+  default_prompt: "Use $danbooru-image-tags with min-post-count=1000 to return Danbooru tags in Markdown, warning me clearly if API validation fails."
