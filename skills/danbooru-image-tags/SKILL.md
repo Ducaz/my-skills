@@ -1,6 +1,6 @@
 ---
 name: danbooru-image-tags
-description: Convert reference images, text-only image-generation instructions, mixed image-and-text requests, and direct tag lookup queries into canonical Danbooru tags with bulk verification against the Danbooru Tags API. Use for image-to-tags, natural-language or irregular-tag prompt conversion, reference-guided prompt edits, tag discovery, negative prompts, booru prompts, and SD/SDXL tag requests. Return Markdown with positive tags in a fenced code block and an optional negative-tag block when useful. Prefer tags meeting the user-selected min-post-count, which defaults to 1000; if operational validation fails, return the candidate tags with a prominent unverified warning. Never generate or edit images.
+description: Convert reference images, text-only image-generation instructions, mixed image-and-text requests, and direct tag lookup queries into canonical Danbooru tags with bulk verification against the Danbooru Tags API. Use for image-to-tags, natural-language or irregular-tag prompt conversion, reference-guided prompt edits, tag discovery, negative prompts, booru prompts, and SD/SDXL tag requests. Return Markdown with tags in fenced code blocks, render underscores as spaces in the final lists, and include a negative-tag block when useful. Prefer tags meeting the user-selected min-post-count, which defaults to 1000; if operational validation fails, return the candidate tags with a prominent unverified warning. Never generate or edit images.
 ---
 
 # Danbooru Tags
@@ -11,8 +11,9 @@ Convert the user's intended subject, scene, or tag query into a concise set of c
 
 - Never generate, edit, or transform an image. Never call an image-generation tool.
 - Format every successful result as Markdown. Put each tag list in its own fenced `text` code block so it remains copy-ready.
-- Provide a positive `Tags` block for scene-generation results and ordinary tag queries. Add a separate `Negative tags` block only when it is necessary or materially helpful. If the user explicitly requests only negative tags, return only the negative block.
+- Provide a `Tags` block for positive-only results. When negative tags are included, title the two blocks `Positive Tags` and `Negative Tags`. If the user explicitly requests only negative tags, return only a `Negative Tags` block.
 - Add brief explanatory prose only when it helps clarify ambiguity, interpretation, substitutions, omissions, parameter handling, negative-tag choices, or validation issues. Keep prose outside the code blocks so it cannot be mistaken for prompt tokens.
+- Keep canonical underscore-form names throughout candidate generation and API validation. In the final code blocks only, replace every underscore with a space: render `full_body` as `full body`. Apply this display transformation to positive, negative, validated, and unverified tags alike.
 - Attempt to validate every emitted tag during the current request. Do not rely on memory, apparent familiarity, user spelling, or a prior request's results when current validation is available.
 - After successful validation, emit a tag only when the Danbooru Tags API confirms that its canonical name exists, has `is_deprecated=false`, and has `post_count >= min-post-count`.
 - After successful validation, omit rejected candidates. Never present a rejected or unverified token as validated.
@@ -54,7 +55,7 @@ When a request could be either text-to-scene or a direct tag query, treat it as 
 6. Do not infer an artist from visual style. Include artist tags only when explicitly requested or reliably identified from supplied metadata. Include character and copyright tags only when explicitly requested or confidently identifiable.
 7. Prefer common, visually meaningful tags. Avoid redundant, weakly implied, contradictory, model-specific, or decorative tags. Do not invent compound tags from individually valid words.
 8. Maintain separate positive and negative candidate sets. Place a candidate in the negative set only when the user explicitly excludes a concept, a mixed-input edit removes a visible feature, or excluding a likely unwanted interpretation would materially improve generation. Do not add generic negative-prompt boilerplate.
-9. Use bare canonical names in the negative set. Do not prefix them with `-` unless the user explicitly requests Danbooru search syntax; when a prefix is requested, validate the unprefixed tag name.
+9. Use bare canonical names in the negative set. The separate `Negative Tags` heading conveys negative-prompt semantics; do not prefix tags with `-`.
 
 ## Validate in bulk
 
@@ -87,11 +88,11 @@ On operational failure:
 1. Keep the intended positive and negative sets separate.
 2. Normalize candidates to the most plausible canonical snake_case form and remove duplicates, contradictions, speculative details, and weak alternatives.
 3. Return the remaining candidates even though their existence, canonical spelling, deprecation status, category, and post counts could not be confirmed.
-4. Place a prominent warning before the tag blocks and label every returned block `(unverified)`.
+4. Place a prominent warning before the tag blocks and mark every returned block as unverified beneath its standard heading.
 5. Do not claim that `min-post-count` was enforced. State that the requested threshold could not be confirmed.
 6. Do not include raw exception traces, credentials, API keys, or verbose diagnostics.
 
-## Negative tags
+## Negative Tags
 
 Use negative tags conservatively. Include them when at least one of these conditions applies:
 
@@ -103,6 +104,17 @@ Use negative tags conservatively. Include them when at least one of these condit
 Omit the negative block for ordinary direct tag queries unless the user asks for exclusions or negative-prompt suggestions. Do not add routine quality negatives merely because they are popular. Never place the same tag in both positive and negative sets; resolve the contradiction from the user's explicit intent before output.
 
 When validation succeeds, every negative tag must independently pass the same existence, deprecation, and `min-post-count` checks as every positive tag. When validation fails operationally, apply the same unverified warning and labeling to the negative block.
+
+## Render tag lists
+
+Preserve canonical underscore-form names until selection and validation are complete. Immediately before composing the final Markdown:
+
+1. Replace every `_` in every displayed tag with a single space.
+2. Preserve tag order, commas, parentheses, hyphens, and other characters.
+3. Do not modify the temporary candidate file, API request values, or validator JSON to use display-form spaces.
+4. Do not revalidate the display-form strings; their underscore-form source records are the validated identities.
+
+For example, validate `full_body`, `blue_hair`, and `looking_at_viewer`, then display `full body, blue hair, looking at viewer`.
 
 ## Final selection and ordering
 
@@ -126,23 +138,23 @@ Default output:
 ## Tags
 
 ```text
-tag_one, tag_two, tag_three
+tag one, tag two, tag three
 ```
 ````
 
 When negative tags are useful:
 
 ````markdown
-## Tags
+## Positive Tags
 
 ```text
-tag_one, tag_two, tag_three
+tag one, tag two, tag three
 ```
 
-## Negative tags
+## Negative Tags
 
 ```text
-negative_tag_one, negative_tag_two
+negative tag one, negative tag two
 ```
 ````
 
@@ -152,7 +164,7 @@ When an explanation is useful, append a short note after the tag blocks:
 ## Tags
 
 ```text
-tag_one, tag_two, tag_three
+tag one, tag two, tag three
 ```
 
 Note: <brief explanation that does not introduce unvalidated prompt tokens>
@@ -161,19 +173,23 @@ Note: <brief explanation that does not introduce unvalidated prompt tokens>
 When validation fails operationally, use this fallback format:
 
 ````markdown
-> **Warning:** Danbooru validation failed. The tags below are unverified; their existence, canonical spelling, deprecation status, and post counts could not be confirmed. The requested `min-post-count` threshold was not enforced.
+> **Warning:** Danbooru validation failed. The tags below are unverified.
 
-## Tags (unverified)
+## Positive Tags
+
+*Unverified.*
 
 ```text
-candidate_tag_one, candidate_tag_two
+candidate tag one, candidate tag two
 ```
 
-## Negative tags (unverified)
+## Negative Tags
+
+*Unverified.*
 
 ```text
-candidate_negative_tag
+candidate negative tag
 ```
 ````
 
-Omit the unverified negative block when no negative tags are useful. If validation later becomes available, rerun the full candidate union rather than treating fallback tags as previously verified.
+Omit the unverified negative block when no negative tags are useful. In that case, use the heading `Tags`, followed by the unverified marker. If validation later becomes available, rerun the full candidate union rather than treating fallback tags as previously verified.
