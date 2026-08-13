@@ -28,7 +28,7 @@ def chunks(values: list[str], size: int):
 
 
 def fetch_json(url: str, retries: int, timeout: float) -> Any:
-    request = Request(url, headers={"Accept": "application/json", "User-Agent": "Codex-Danbooru-Image-Tags/1.1"})
+    request = Request(url, headers={"Accept": "application/json", "User-Agent": "Codex-Danbooru-Tags/1.1"})
     for attempt in range(retries + 1):
         try:
             with urlopen(request, timeout=timeout) as response:

@@ -4,6 +4,7 @@ Personal Codex skills maintained in this repository.
 
 ## Skills
 
+- `danbooru-tags` - convert image briefs and tag queries into validated Danbooru tags.
 - `image-prompt-helper` - optimize prompts for image generation and editing.
 - `jellyfin-media-organizer` - plan and safely normalize Jellyfin media libraries.
 - `media-metadata-apis` - query TMDB, TVDB, and AniDB metadata from local credentials.

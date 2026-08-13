@@ -1,0 +1,4 @@
+interface:
+  display_name: "Danbooru Tags"
+  short_description: "Create verified tags with concise visual complements."
+  default_prompt: "Use $danbooru-tags with min-post-count=1000 to return validated Danbooru tags, adding a concise natural-language complement for crucial details without qualifying tags."

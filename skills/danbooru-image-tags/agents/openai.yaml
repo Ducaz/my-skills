@@ -1,4 +1,0 @@
-interface:
-  display_name: "Danbooru Tags"
-  short_description: "Create Danbooru tags with validation fallback."
-  default_prompt: "Use $danbooru-image-tags with min-post-count=1000 to return Danbooru tags in Markdown with underscores displayed as spaces, warning me clearly if API validation fails."
