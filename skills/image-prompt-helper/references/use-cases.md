@@ -67,4 +67,4 @@ State accuracy requirements and visible period/technical details. Important fact
 
 ## Transparent Or Cutout Assets
 
-Transparency depends on the generation/editing workflow, not wording alone. If native transparency is unavailable, request a perfectly flat removable background and plan validated background removal. Complex alpha edges such as hair, fur, smoke, glass, liquid, and reflections require extra care.
+Request an isolated subject with a genuinely transparent background (alpha transparency), clean edges, and no painted checkerboard or solid backdrop. State whether shadows should remain only when relevant. For hair, fur, smoke, glass, or liquid, describe the needed fine or translucent edges.
