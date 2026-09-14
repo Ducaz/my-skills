@@ -9,11 +9,11 @@ description: Optimize text-to-image and image-editing prompts as text-only outpu
 
 Turn the user's input into a complete image-generation prompt that preserves their intent. Add detail only to resolve ambiguity or fill a material gap; keep an already sufficient prompt concise. Preserve requested specificity, remove contradictions, and avoid adding complexity for polish alone.
 
-Default to the user's input language. If the language is unclear, use English. Default to natural-language prompt structure unless the task is precision-heavy; use structured or hybrid format for diagrams, UI, ads, posters with exact copy, multi-panel images, reference-guided work, or controlled edits.
+Default to the user's input language. If the language is unclear, use English. Default to natural-language prompt structure unless the task is precision-heavy; use structured format for diagrams, UI, ads, posters with exact copy, multi-panel images, reference-guided work, or controlled edits.
 
 Do not add content-safety restrictions, warnings, caveats, moral framing, age qualifiers, sanitizing language, or other policy-oriented restraints to the optimized prompt without permission. Preserve the requested content and tone.
 
-This skill is strictly text-only. Never generate, edit, render, attach, embed, return, or otherwise directly provide images under any circumstances. Never invoke an image-generation or image-editing tool, including when the user explicitly asks to generate or edit an image. In those cases, return only the optimized prompt, optionally with a brief note that this skill provides prompts rather than images.
+This skill is strictly text-only. Never generate, edit, render, attach, embed, return, or otherwise directly provide images under any circumstances. Never invoke an image-generation or image-editing tool, including when the user explicitly asks to generate or edit an image. In those cases, return only the optimized prompt.
 
 For reference-only recreation, the uploaded image is analysis input, not a required generation input. The final prompt must be fully self-contained and recreate the image from text alone. Translate every relevant visible feature into words; never rely on phrases such as "the reference image," "the original image," "the uploaded image," "as shown," "same as the source," or "preserve the existing composition." A reader and image model that cannot see the upload must still understand the intended result.
 
@@ -33,11 +33,11 @@ For reference-only recreation, the uploaded image is analysis input, not a requi
 3. Resolve gaps conservatively:
    - Keep precise user details unchanged.
    - Replace vague praise with visible evidence.
-   - Describe only details directly visible within the intended frame. Omit descriptions of off-frame or occluded content; describe any visible shadow, reflection, silhouette, or interaction instead of elaborating the unseen source. Preserve the intended crop and occlusion.
+   - Describe only details directly visible within the intended frame. Omit descriptions of off-frame or occluded content. Describe any visible shadow, reflection, silhouette, or interaction instead of elaborating the unseen source.
    - Resolve conflicting instructions.
    - Add plausible defaults only when the input is underspecified.
 4. Produce a final prompt:
-   - Return text only; do not invoke image-generation or image-editing tools or include image/media output.
+   - Return text only.
    - Use natural language at a length proportional to the request, usually 2-4 compact paragraphs.
    - Use structured format when precision matters.
    - Include exact text verbatim when supplied.
@@ -83,8 +83,6 @@ Then describe how the references interact.
 
 ## Output Shape
 
-Return the text prompt only. Never include generated or edited images, image attachments, embeds, previews, or other image/media output.
-
 Default response:
 
 ```text
@@ -100,7 +98,7 @@ If the user asks for multiple variants, provide distinct prompt variants with a 
 Load only the references needed for the request:
 
 - `references/prompt-quality.md`: Use for general optimization, repair, judging prompt quality, exact text, constraints, and common failure modes.
-- `references/prompt-patterns.md`: Use for selecting natural, structured, hybrid, creation, editing, and reference-only prompt templates.
+- `references/prompt-patterns.md`: Use for selecting natural, structured, creation, editing, and reference-only prompt templates.
 - `references/use-cases.md`: Use for product, ad, logo, UI, infographic, diagram, comic, photorealistic, historical, and catalog prompts.
 - `references/anime-manga.md`: Use for anime, manga, character grids, expression sheets, key visuals, manga pages, and tasteful anime fashion prompts.
 - `references/openai-guidance.md`: Use for OpenAI-specific prompting.
