@@ -6,13 +6,6 @@ Use this reference to choose the output format and prompt structure.
 
 Use for coherent scenes where atmosphere, action, and storytelling matter more than many independent constraints.
 
-Order:
-
-```text
-Deliverable and scene -> subject and action -> composition -> art direction ->
-lighting and mood -> exact text -> constraints
-```
-
 Typical shape:
 
 ```text
@@ -93,7 +86,7 @@ Create a new scene using [specific attributes] from Image 1 and [specific attrib
 
 ## Reference-Only Recreation
 
-When the user supplies an image to obtain a recreation prompt, use the image only to observe the result. Write a self-contained text-to-image prompt that does not require the image as an input:
+Apply [Recreation Prompt Rules](../SKILL.md#recreation-prompt-rules). Template:
 
 ```text
 Create [asset type and main subject, stated directly].
@@ -106,6 +99,7 @@ Text: [all readable text quoted exactly, with placement and typography; otherwis
 Constraints: [concrete elements to include or exclude].
 ```
 
-Do not use deictic or dependency language such as "the reference," "the original," "the uploaded image," "the source," "as shown," "same as," "match," "copy," or "preserve the existing composition." Replace each such instruction with the actual visual property or relationship. For example, replace "keep the same camera angle" with "three-quarter view from slightly below eye level," and replace "preserve the layout" with explicit positions, scale, spacing, and hierarchy.
+Example rewrites:
 
-Deletion test: hide the supplied image and read only the final prompt. If any subject, layout, style, color, lighting, text, or constraint remains unknowable, the prompt is incomplete.
+- "Keep the same camera angle" -> "Three-quarter view from slightly below eye level."
+- "Preserve the layout" -> "The headline spans the upper third; a centered bottle fills the lower half, with equal side margins."

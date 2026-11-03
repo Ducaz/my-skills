@@ -2,24 +2,11 @@
 
 Load this reference for anime, manga, character sheets, key visuals, expression grids, manga pages, and anime-adjacent illustration.
 
-## General Anime Structure
+## Style
 
-Use the same visual-brief order as general prompts, with anime-specific rendering terms:
+Describe rendering through visible style traits: crisp linework, cel shading, screentone, watercolor background texture, luminous eyes, limited palette, speed lines, rim light, or key-visual composition.
 
-```text
-Image brief:
-Setting:
-Scene:
-Visible character design:
-Composition:
-Style:
-Lighting:
-Constraints:
-```
-
-Prefer original characters and describe transferable style traits: crisp linework, cel shading, screentone, watercolor background texture, luminous eyes, limited palette, speed lines, rim light, or key-visual composition.
-
-Avoid relying only on franchise, studio, or artist names. If a named influence appears in user input, translate it into visible traits and keep the subject original for reusable/public output.
+Preserve user-specified character identities and named influences, supplementing names with visible traits.
 
 ## Character Consistency
 
@@ -34,11 +21,11 @@ For grids, sheets, and story continuation, repeat invariants:
 
 ## Expression Or Character Grids
 
-Use fixed schema:
+Follow the requested panel count, aspect ratio, layout, framing, and reading order. Adapt this schema to the request:
 
 ```text
-Canvas: Square 4x4 expression sheet with equal panels and clean gutters
-Subject: The same original [description] in every panel
+Canvas: [aspect ratio, panel count and arrangement, gutters]
+Subject: The same [specified character or original character description] in every panel
 Consistency: [fixed attributes]
 Expressions by panel:
 1 ...
@@ -47,7 +34,7 @@ Style: ...
 Constraints: ...
 ```
 
-Keep head scale, crop, costume, and rendering consistent across panels.
+Keep head scale, crop, costume, and rendering consistent across panels except for variations requested by the user.
 
 ## Manga Layouts
 

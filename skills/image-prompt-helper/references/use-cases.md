@@ -36,7 +36,7 @@ Write as a creative brief:
 
 ## Logos
 
-Ask for an original mark with simple shapes, strong silhouette, balanced negative space, generous padding, flat colors, and scalability. Avoid gradients, mockups, excessive detail, and watermark.
+Determine whether the user wants a standalone mark, an icon, or a presentation mockup. Tailor silhouette, negative space, padding, and detail to the intended display size and use. Preserve requested gradients, complexity, and presentation style; choose flat colors and simplified shapes when they fit the brief.
 
 ## UI Mockups
 
