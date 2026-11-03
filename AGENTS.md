@@ -1,18 +1,22 @@
 # Repository Guidelines
 
+## Project Purpose
+
+Maintain and share the author's reusable skills for an open-ended range of tasks and domains. Keep project-wide guidance independent of any fixed device, platform, or AI agent. Document tool, service, runtime, and platform requirements within the affected skill, and label environment-specific examples with their scope.
+
 ## Project Structure & Module Organization
 
-This repository maintains reusable Codex skills under `skills/`. Each skill lives in a kebab-case directory such as `skills/media-metadata-apis/` and must include a `SKILL.md` file with YAML front matter (`name` and `description`) followed by its operating instructions. Optional supporting material belongs in:
+Store skills under `skills/`. Each skill lives in a kebab-case directory such as `skills/media-metadata-apis/` and must include a `SKILL.md` file with YAML front matter (`name` and `description`) followed by its operating instructions. Optional supporting material belongs in:
 
-- `agents/openai.yaml` for the display name, description, and default prompt.
+- `agents/` for agent-specific metadata, such as `openai.yaml` with a display name, description, and default prompt for compatible OpenAI tools.
 - `references/` for detailed guidance that should not crowd `SKILL.md`.
-- `scripts/` for reusable Python or PowerShell helpers.
+- `scripts/` for reusable helpers in a language appropriate to the skill.
 
 Update the root `README.md` skill list when adding or removing a skill.
 
 ## Build, Test, and Development Commands
 
-There is no build step. Run helpers from the repository root:
+There is no project-wide build step. Run helpers with the runtime required by the affected skill. These PowerShell examples run from the repository root:
 
 ```powershell
 python skills\media-metadata-apis\scripts\metadata_lookup.py --help
@@ -24,7 +28,7 @@ The first two commands exercise CLI parsing and tag validation. The PowerShell s
 
 ## Coding Style & Naming Conventions
 
-Use four-space indentation, descriptive snake_case Python identifiers, and approved PowerShell `Verb-Noun` function names. Keep scripts dependency-light; current Python helpers use the standard library. Follow `.gitattributes`: LF for `.py`, CRLF for `.ps1`. Write short, imperative Markdown rules. Keep `SKILL.md`, relevant references, and `agents/openai.yaml` consistent.
+Use four-space indentation, descriptive snake_case Python identifiers, and approved PowerShell `Verb-Noun` function names. Keep scripts dependency-light and document required packages and runtimes in the affected skill. Follow `.gitattributes`: LF for `.py`, CRLF for `.ps1`. Write short, imperative Markdown rules. Keep `SKILL.md`, relevant references, and any agent-specific metadata consistent.
 
 ## Testing Guidelines
 
